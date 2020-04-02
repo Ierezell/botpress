@@ -53,7 +53,8 @@ export default class Utterance {
   private _kmeans?: sdk.MLToolkit.KMeans.KmeansResult
   private _sentenceEmbedding?: number[]
 
-  constructor(tokens: string[], vectors: number[][], posTags: POSClass[], public languageCode: Readonly<string>) {
+  constructor(tokens: string[], vectors: number[][], posTags: POSClass[], sentEmb, public languageCode: Readonly<string>) {
+    this._sentenceEmbedding = sentEmb
     const allSameLength = [tokens, vectors, posTags].every(arr => arr.length === tokens.length)
     if (!allSameLength) {
       throw Error(`Tokens, vectors and postTags dimensions must match`)
@@ -190,7 +191,7 @@ export default class Utterance {
     const tokens = this.tokens.map(x => x.value)
     const vectors = this.tokens.map(x => <number[]>x.vector)
     const POStags = this.tokens.map(x => x.POS)
-    const utterance = new Utterance(tokens, vectors, POStags, this.languageCode)
+    const utterance = new Utterance(tokens, vectors, POStags, this._sentenceEmbedding, this.languageCode)
     utterance.setGlobalTfidf({ ...this._globalTfidf })
 
     if (copyEntities) {
@@ -265,14 +266,16 @@ export async function buildUtteranceBatch(
   const uniqTokens = _.uniq(_.flatten(tokenUtterances))
   const vectors = await tools.vectorize_tokens(uniqTokens, language)
   const vectorMap = _.zipObject(uniqTokens, vectors)
+  // @ts-ignore
+  const sentenceEmbedding = await tools.vectorize_utterances(parsed.map(p => p.utterance), language) as number[][]
 
-  return _.zip(tokenUtterances, POSUtterances, parsed)
-    .map(([tokUtt, POSUtt, { utterance: utt, parsedSlots }]) => {
+  return _.zip(tokenUtterances, POSUtterances, parsed, sentenceEmbedding)
+    .map(([tokUtt, POSUtt, { utterance: utt, parsedSlots }, sentEmb]) => {
       if (tokUtt.length === 0) {
         return
       }
       const vectors = tokUtt.map(t => vectorMap[t])
-      const utterance = new Utterance(tokUtt, vectors, POSUtt, language)
+      const utterance = new Utterance(tokUtt, vectors, POSUtt, sentEmb, language)
 
       // TODO: temporary work-around
       // covers a corner case where tokenization returns tokens that are not identical to `parsed` utterance
@@ -343,6 +346,7 @@ export function getAlternateUtterance(utterance: Utterance, vocabVectors: Token2
           altToks.map(t => t.value),
           altToks.map(t => <number[]>t.vector),
           altToks.map(t => t.POS),
+          undefined,
           utterance.languageCode
         )
       }
@@ -358,5 +362,5 @@ export function makeTestUtterance(str: string): Utterance {
   const toks = str.split(/(\s)/g)
   const vecs = new Array(toks.length).fill([0])
   const pos = new Array(toks.length).fill('N/A')
-  return new Utterance(toks, vecs, pos, 'en')
+  return new Utterance(toks, vecs, pos, undefined, 'en')
 }

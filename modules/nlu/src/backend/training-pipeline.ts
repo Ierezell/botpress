@@ -128,6 +128,7 @@ export const computeKmeans = (intents: Intent<Utterance>[], tools: Tools): sdk.M
     // @ts-ignore
     .uniqBy((t: UtteranceToken) => t.value)
     .map((t: UtteranceToken) => t.vector)
+    .filter(Boolean)
     .value() as number[][]
 
   if (data.length < 2) {
@@ -403,6 +404,7 @@ const TrainSlotTagger = async (input: TrainOutput, tools: Tools, progress: progr
   const hasSlots = _.flatMap(input.intents, i => i.slot_definitions).length > 0
 
   if (!hasSlots) {
+    console.log('no slots')
     progress()
     return Buffer.from('')
   }
@@ -483,7 +485,7 @@ export const Trainer: Trainer = async (input: TrainInput, tools: Tools): Promise
   try {
     let output = await PreprocessInput(input, tools)
     output = await TfidfTokens(output)
-    output = ClusterTokens(output, tools)
+    // output = ClusterTokens(output, tools)
     output = await ExtractEntities(output, tools)
     output = await AppendNoneIntent(output, tools)
     const exact_match_index = BuildExactMatchIndex(output)

@@ -11,6 +11,7 @@ import { getLatestModel } from '../model-service'
 import { InvalidLanguagePredictorError } from '../predict-pipeline'
 import { removeTrainingSession, setTrainingSession } from '../train-session-service'
 import { NLUState, Token2Vec, Tools, TrainingSession } from '../typings'
+import axios from 'axios'
 
 export const initializeLanguageProvider = async (bp: typeof sdk, state: NLUState) => {
   const globalConfig = (await bp.config.getModuleConfig('nlu')) as Config
@@ -48,6 +49,12 @@ function initializeEngine(bp: typeof sdk, state: NLUState) {
     vectorize_tokens: async (tokens, lang) => {
       const a = await state.languageProvider.vectorize(tokens, lang)
       return a.map(x => Array.from(x.values()))
+    },
+    // @ts-ignore
+    vectorize_utterances: async (utterances: string[], lang: string) => {
+      const { data } = await axios.post('http://localhost:5000/vectorize_utterances', { utterances, lang })
+      console.log('asert lol', _.isArray(data.vectors), _.isArray(data.vectors[0]))
+      return data.vectors
     },
     generateSimilarJunkWords: (vocab: string[], lang: string) =>
       state.languageProvider.generateSimilarJunkWords(vocab, lang),

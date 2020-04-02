@@ -114,7 +114,7 @@ async function makePredictionUtterance(input: PredictStep, predictors: Predictor
     .filter(Boolean)
     .forEach(u => {
       u.setGlobalTfidf(tfidf)
-      u.setKmeans(kmeans)
+      // u.setKmeans(kmeans)
     })
 
   return {
