@@ -53,7 +53,6 @@ function initializeEngine(bp: typeof sdk, state: NLUState) {
     // @ts-ignore
     vectorize_utterances: async (utterances: string[], lang: string) => {
       const { data } = await axios.post('http://localhost:5000/vectorize_utterances', { utterances, lang })
-      console.log('asert lol', _.isArray(data.vectors), _.isArray(data.vectors[0]))
       return data.vectors
     },
     generateSimilarJunkWords: (vocab: string[], lang: string) =>
