@@ -359,7 +359,9 @@ export class RemoteLanguageProvider implements LanguageProvider {
         break
       }
 
-      const fetched = await this.queryProvider<number[][]>(lang, '/vectorize', { tokens: query }, 'vectors')
+      // const fetched = await this.queryProvider<number[][]>(lang, '/vectorize', { tokens: query }, 'vectors')
+      const { data } = await axios.post('http://localhost:5000/vectorize', { tokens: query, lang })
+      const fetched = data.vectors
 
       if (fetched.length !== query.length) {
         throw new Error(

@@ -49,6 +49,8 @@ function initializeEngine(bp: typeof sdk, state: NLUState) {
     vectorize_tokens: async (tokens, lang) => {
       const a = await state.languageProvider.vectorize(tokens, lang)
       return a.map(x => Array.from(x.values()))
+      // const { data } = await axios.post('http://localhost:5000/vectorize', { tokens, lang })
+      // return data.vectors
     },
     // @ts-ignore
     vectorize_utterances: async (utterances: string[], lang: string) => {

@@ -54,7 +54,7 @@ export default class Utterance {
   private _sentenceEmbedding?: number[]
 
   constructor(tokens: string[], vectors: number[][], posTags: POSClass[], sentEmb, public languageCode: Readonly<string>) {
-    this._sentenceEmbedding = sentEmb
+    // this._sentenceEmbedding = sentEmb
     const allSameLength = [tokens, vectors, posTags].every(arr => arr.length === tokens.length)
     if (!allSameLength) {
       throw Error(`Tokens, vectors and postTags dimensions must match`)
@@ -267,7 +267,8 @@ export async function buildUtteranceBatch(
   const vectors = await tools.vectorize_tokens(uniqTokens, language)
   const vectorMap = _.zipObject(uniqTokens, vectors)
   // @ts-ignore
-  const sentenceEmbedding = await tools.vectorize_utterances(parsed.map(p => p.utterance), language) as number[][]
+  // const sentenceEmbedding = await tools.vectorize_utterances(parsed.map(p => p.utterance), language) as number[][]
+  const sentenceEmbedding = null
 
   return _.zip(tokenUtterances, POSUtterances, parsed, sentenceEmbedding)
     .map(([tokUtt, POSUtt, { utterance: utt, parsedSlots }, sentEmb]) => {
