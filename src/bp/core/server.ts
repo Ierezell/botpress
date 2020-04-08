@@ -438,7 +438,7 @@ export default class HTTPServer {
 
   async getAxiosConfigForBot(botId: string, options?: AxiosOptions): Promise<AxiosBotConfig> {
     const basePath = options && options.localUrl ? process.LOCAL_URL : process.EXTERNAL_URL
-    const serverToken = generateUserToken(SERVER_USER, SERVER_USER_STRATEGY, false, '5m', TOKEN_AUDIENCE)
+    const serverToken = generateUserToken(SERVER_USER, SERVER_USER_STRATEGY, false, '1d', TOKEN_AUDIENCE)
     return {
       baseURL: `${basePath}/api/v1/bots/${botId}`,
       headers: {

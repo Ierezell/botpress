@@ -169,6 +169,12 @@ export default async (bp: typeof sdk) => {
     //   // @ts-ignore
     // })
     // testResults.OOSF1 = f1Scorer.getResults()
+    // @ts-ignore
+    console.log("True ", Object.values(testResults).filter(t => t.success).length)
+    // @ts-ignore
+    console.log("Total ", Object.values(testResults).length)
+    //@ts-ignore
+    console.log("Prct ", Object.values(testResults).filter(t => t.success).length / Object.values(testResults).length)
     res.send(testResults)
   })
 }
@@ -229,9 +235,9 @@ function conditionMatch(nlu: sdk.IO.EventUnderstanding, [key, matcher, expected]
       reason: success
         ? ''
         : `Intent doesn't match. \nexpected: ${expected} \nreceived: ${received} \nconfidence: ${_.round(
-            nlu.intent.confidence,
-            2
-          )}`,
+          nlu.intent.confidence,
+          2
+        )}`,
       received,
       expected
     }
@@ -249,9 +255,9 @@ function conditionMatch(nlu: sdk.IO.EventUnderstanding, [key, matcher, expected]
       reason: success
         ? ''
         : `Context doesn't match. \nexpected: ${expected} \nreceived: ${received} \nconfidence ${_.round(
-            ctxPred.confidence,
-            2
-          )}`,
+          ctxPred.confidence,
+          2
+        )}`,
       received,
       expected
     }
